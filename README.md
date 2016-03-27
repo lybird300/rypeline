@@ -4,7 +4,7 @@ Jimmy Breen, Ben Mayne
 
 RNAseq pipeline for SCOPE study
 
-![RNAseq Pipeline Flow Diagram](RNAseq_pipeline_workflow.pdf =700x) 
+![RNAseq Pipeline Flow Diagram](./RNAseq_pipeline_workflow.pdf) 
 
 ## Pipeline Requirements
 
