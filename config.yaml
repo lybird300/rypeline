@@ -1,0 +1,49 @@
+# This is the starting yaml for Rypeline's RNAseq pipeline
+
+logs_dir: 
+
+threads: 4
+
+sra_params:
+	fastqdump: --gzip --split-3
+
+fastqc:
+
+trim:
+	bbmerge:
+	trimmomatic:
+
+align:
+	align_dir:
+	tophat2:
+		params:
+		index:
+	star:
+		params:
+		index:
+	hisat2:
+		params: 
+		index:
+	samtools:
+		params: -bhS ->
+
+afree:
+	afree_dir:
+	salmon:
+		params:
+		index:
+
+quant:
+	quant_dir:
+	htseq:
+		params:
+
+	eXpress:
+		params:
+
+de:
+	de_dir:
+	deseq2: # R script that does all the DE analysis
+	edger: # R script that does all the DE analysis
+
+
