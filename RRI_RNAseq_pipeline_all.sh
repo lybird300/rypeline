@@ -12,7 +12,7 @@
 ##	StringTie
 ##	Cufflinks (for downstream assembly)
 
-### DEVELOPMENT 
+### DEVELOPMENT
 ## -Convert to ruffus python pipeline
 ## -Config file in YAML format
 ## -Phoenix usage
@@ -33,7 +33,7 @@ DATA=$base/Data
 ASS=$base/4_stringtie
 QUANT1=$base/3_featureCounts
 QUANT2=$base/3_salmon
-BAMS=$base/2_Hisat2
+BAMS=$base/2_hisat2
 TRIM=$base/1_AdapterRemoval
 QC=$base/0_FastQC
 
@@ -52,9 +52,7 @@ hg38=/localscratch/Refs/human/hg38_hg20_GRCh38p5/hisat/grch38_tran/genome_tran
 mm10=/localscratch/Refs/mouse/grcm38_snp_tran/genome_snp_tran
 gff=/localscratch/Refs/mouse/gencode.vM11.chr_patch_hapl_scaff.annotation.gtf
 hg38_trans=/localscratch/Refs/human/hg38_hg20_GRCh38p5/gencode.v24.lncRNA_transcripts_plus_ERCC.fa.gz
-hg38_map=
-mm10_map=/localscratch/Refs/mouse/mm38.genenameMap.map
-mm10_trans=/localscratch/Refs/mouse/mm38.rna.fa.gz
+mm10_trans=/localscratch/Refs/mouse/gencode.vM11.transcripts.fa.gz
 
 
 # QC using FastQC
@@ -80,7 +78,7 @@ done
 # Alignment with HISAT2
 mkdir -p $BAMS
 for FQGZ in $TRIM/*_trim1*.fastq.gz
- do 
+ do
 	hisat2 -p $threads -x $mm10 \
 		-1 ${FQGZ} \
 		-2 ${FQGZ/trim1/trim2} | \
@@ -88,7 +86,7 @@ for FQGZ in $TRIM/*_trim1*.fastq.gz
 			2>> $BAMS/project_alignment.stats
 	$bamba sort -p -t $threads -n \
 		-o $BAMS/$(basename $FQGZ _trim1.fastq.gz)_hisat2_mm10.sorted.bam \
-		$BAMS/$(basename $FQGZ _trim1.fastq.gz)_hisat2_mm10.bam  
+		$BAMS/$(basename $FQGZ _trim1.fastq.gz)_hisat2_mm10.bam
 done
 
 ## ----------------------------------------
@@ -96,7 +94,7 @@ done
 ## ----------------------------------------
 ##mkdir -p $QUANT
 ##for FQGZ in $BAMS/*_hisat2_mm10.sorted.bam
-## do 
+## do
 ##	htseq-count -f bam -t gene -i gene_id \
 ##		$FQGZ $gff > $QUANT/$(basename $FQGZ _hisat2_mm10.sorted.bam)_genes.counts
 ##	htseq-count -f bam -t transcript -i ID \
@@ -114,19 +112,19 @@ cut -f1,7- $QUANT1/project_genes.out | sed 1d > $QUANT1/project_genes.txt
 
 #Quantification with salmon
 mkdir -p $QUANT2
-$salmon index -type quasi -p $threads -i $QUANT2/transcripts_salmon_idx -t $mm10_trans
+$salmon index -p $threads -i $QUANT2/transcripts_salmon_idx \
+  -t $mm10_trans --gencode --perfectHash
 for FQGZ in $TRIM/*_trim1*.fastq.gz
  do
-        $salmon quant -l ISF -i $QUANT2/transcripts_salmon_idx \
-                -p $threads -g $mm10_map --useVBOpt \
-                -1 $FQGZ -2 ${FQGZ/trim1/trim2} \
-                --numBootstraps 100 -o $QUANT2/$(basename $FQGZ _trim1.fastq.gz).salmonOut
+        $salmon quant -l A -i $QUANT2/transcripts_salmon_idx \
+          -p $threads -1 $FQGZ -2 ${FQGZ/trim1/trim2} \
+          --numBootstraps 100 -o $QUANT2/$(basename $FQGZ _trim1.fastq.gz).salmonOut
 done
 
 
 # Assembly
 mkdir -p $ASS
-for bam in $BAMS/*.sorted.bam 
+for bam in $BAMS/*.sorted.bam
  do
 	$stringtie -p $threads -m 30 -G $gff \
           -o $ASS/$(basename $bam _hisat2_mm10.sorted.bam)_assembly.gtf \
@@ -137,5 +135,4 @@ done
 $stringtie --merge -G $gff -o $ASS/merged.gtf `find $ASS -name "*assembly.gtf"`
 awk '{if($3=="transcript")print}' $ASS/merged.gtf > $ASS/merged.transcript.gtf
 
-# from here we cuffcompare with other sets  
-
+# from here we cuffcompare with other sets
