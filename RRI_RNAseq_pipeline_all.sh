@@ -48,10 +48,10 @@ threads=32
 
 # References
 hg38=/localscratch/Refs/human/hg38_hg20_GRCh38p5/hisat/grch38_tran/genome_tran
-#gff=/localscratch/Refs/human/hg38_hg20_GRCh38p5/gencode.v24.chr_patch_hapl_scaff.annotation.gff3
+#gff=/localscratch/Refs/human/hg38_hg20_GRCh38p5/gencode.v25.chr_patch_hapl_scaff.annotation.gff3.gz
 mm10=/localscratch/Refs/mouse/grcm38_snp_tran/genome_snp_tran
 gff=/localscratch/Refs/mouse/gencode.vM11.chr_patch_hapl_scaff.annotation.gtf
-hg38_trans=/localscratch/Refs/human/hg38_hg20_GRCh38p5/gencode.v24.lncRNA_transcripts_plus_ERCC.fa.gz
+hg38_trans=/localscratch/Refs/human/hg38_hg20_GRCh38p5/gencode.v25.transcripts_ercc92.fa.gz
 mm10_trans=/localscratch/Refs/mouse/gencode.vM11.transcripts.fa.gz
 
 
